@@ -42,6 +42,8 @@ public class VmRuntimeUtils {
 
   private static final String VM_API_PROXY_HOST = "appengine.googleapis.internal";
   private static final int VM_API_PROXY_PORT = 10001;
+  
+  private static final String VM_MEMCACHE_PROXY_HOST = "memcache.appengine.googleapis.internal";
 
   public static final long ONE_DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
 
@@ -200,5 +202,21 @@ public class VmRuntimeUtils {
     String server = firstNonNull(System.getenv("API_HOST"), VM_API_PROXY_HOST);
     String port = firstNonNull(System.getenv("API_PORT"), "" + VM_API_PROXY_PORT);
     return server + ":" + port;
+  }
+  
+  /**
+   * Returns the host:port of the Memcache API server.
+   *
+   * @return If environment variables MEMCACHE_HOST or MEMCACHE_PORT port are set the host and/or port is
+   *         calculated from them. Otherwise the default host:port is used.
+   */
+  public static String getMemcacheServer() {
+	  String server = firstNonNull(System.getenv("MEMCACHE_HOST"), VM_MEMCACHE_PROXY_HOST);
+	  String port = firstNonNull(System.getenv("MEMCACHE_PORT"), "" + VM_API_PROXY_PORT);
+	  return server + ":" + port;
+  }
+  
+  public static String getMemcacheHost() {
+	  return firstNonNull(System.getenv("MEMCACHE_HOST"), VM_MEMCACHE_PROXY_HOST);
   }
 }

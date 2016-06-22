@@ -37,12 +37,14 @@ import com.google.apphosting.api.UserServicePb.CreateLoginURLResponse;
 import com.google.apphosting.api.UserServicePb.CreateLogoutURLResponse;
 import com.google.apphosting.utils.remoteapi.RemoteApiPb;
 
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnManagerPNames;
+import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -108,6 +110,9 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
     PoolingClientConnectionManager connectionManager = new PoolingClientConnectionManager();
     connectionManager.setMaxTotal(VmApiProxyEnvironment.MAX_CONCURRENT_API_CALLS);
     connectionManager.setDefaultMaxPerRoute(VmApiProxyEnvironment.MAX_CONCURRENT_API_CALLS);
+    connectionManager.setMaxPerRoute(
+    		new HttpRoute(new HttpHost(VmRuntimeUtils.getMemcacheHost())), 
+    		VmApiProxyEnvironment.MAX_CONCURRENT_MEMCACHE_API_CALLS);
     return connectionManager;
   }
 
@@ -376,12 +381,10 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
     remoteRequest.setRequestId(environment.getTicket());
     remoteRequest.setRequestAsBytes(requestData);
 
-    HttpPost request = new HttpPost("http://" + environment.getServer() + REQUEST_ENDPOINT);
-    if (packageName.equals("memcache")) {
-      request.setHeader(RPC_STUB_ID_HEADER, MEMCACHE_REQUEST_STUB_ID);
-    } else {
-      request.setHeader(RPC_STUB_ID_HEADER, REQUEST_STUB_ID);
-    }
+    boolean memcacheRequest = packageName.equals("memcache");
+    HttpPost request = new HttpPost("http://" + (memcacheRequest ? 
+    		environment.getServer() : VmRuntimeUtils.getMemcacheServer()) + REQUEST_ENDPOINT);
+    request.setHeader(RPC_STUB_ID_HEADER, memcacheRequest ? MEMCACHE_REQUEST_STUB_ID : REQUEST_STUB_ID);
     request.setHeader(RPC_METHOD_HEADER, REQUEST_STUB_METHOD);
 
     // Set TCP connection timeouts.
