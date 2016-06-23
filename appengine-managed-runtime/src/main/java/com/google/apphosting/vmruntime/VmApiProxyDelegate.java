@@ -110,9 +110,10 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
     PoolingClientConnectionManager connectionManager = new PoolingClientConnectionManager();
     connectionManager.setMaxTotal(VmApiProxyEnvironment.MAX_CONCURRENT_API_CALLS);
     connectionManager.setDefaultMaxPerRoute(VmApiProxyEnvironment.MAX_CONCURRENT_API_CALLS);
-    connectionManager.setMaxPerRoute(
-    		new HttpRoute(new HttpHost(VmRuntimeUtils.getMemcacheHost())), 
-    		VmApiProxyEnvironment.MAX_CONCURRENT_MEMCACHE_API_CALLS);
+    // TODO(binyu) Enable once the DNS mapping for memcache server is added to the Flex VM images. 
+//    connectionManager.setMaxPerRoute(
+//    		new HttpRoute(new HttpHost(VmRuntimeUtils.getMemcacheHost())), 
+//    		VmApiProxyEnvironment.MAX_CONCURRENT_MEMCACHE_API_CALLS);
     return connectionManager;
   }
 
@@ -382,8 +383,10 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
     remoteRequest.setRequestAsBytes(requestData);
 
     boolean memcacheRequest = packageName.equals("memcache");
-    HttpPost request = new HttpPost("http://" + (memcacheRequest ? 
-    		environment.getServer() : VmRuntimeUtils.getMemcacheServer()) + REQUEST_ENDPOINT);
+    // TODO(binyu): Enable once DNS mapping for memcache service is added to the Flex VM images.
+//    HttpPost request = new HttpPost("http://" + (memcacheRequest ? 
+//    		environment.getServer() : VmRuntimeUtils.getMemcacheServer()) + REQUEST_ENDPOINT);
+    HttpPost request = new HttpPost("http://" + environment.getServer() + REQUEST_ENDPOINT);
     request.setHeader(RPC_STUB_ID_HEADER, memcacheRequest ? MEMCACHE_REQUEST_STUB_ID : REQUEST_STUB_ID);
     request.setHeader(RPC_METHOD_HEADER, REQUEST_STUB_METHOD);
 
