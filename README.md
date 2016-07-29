@@ -12,7 +12,7 @@ the image, you need to build it with either a local docker installation or confi
 This will create the following docker images:
  * openjdk8:8-jre
  * jetty9:9.3.x
- * jetty9-compatible:1.9.x
+ * jetty9-compat
 
 The last of these images may be used as the basis for a Java Web Application Archive: put a Dockerfile at the top directory (for example, with a Maven build, create the Dockerfile in ./src/main/webapp directory) and from this Docker image, just add your Web Application content into the /app of the container.
 
@@ -27,10 +27,11 @@ To use custom build docker image as the basis for a Java Web Application Archive
 First, build custom docker image of jetty9-compat, push to google cloud repo.
 
       mvn clean install
+      # For latest docker beta on Mac, use mvn install -DdockerHost=unix:///var/run/docker.sock 
       docker tag -f jetty9-compat gcr.io/<your_gcp_project_id>/jetty9-compat:<your_label>
       gcloud docker push gcr.io/<your_gcp_project_id>/jetty9-compat:<your_label>
 
-Then, use your custom docker image in the Dcokerfile, and run the App Engine flexible environment container via the Cloud SDK.
+Then, use your custom docker image in the Dockerfile, and run the App Engine flexible environment container via the Cloud SDK.
 
       FROM gcr.io/<your_gcp_project_id>/jetty9-compat:<your_label>
       ADD . /app
