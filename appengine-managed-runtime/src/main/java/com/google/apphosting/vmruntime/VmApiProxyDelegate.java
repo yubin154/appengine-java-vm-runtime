@@ -52,6 +52,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -277,6 +278,10 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
           logger.warning("Error body: " + errorStreamScanner.useDelimiter("\\Z").next());
           throw new RPCFailedStatusException(
               packageName, methodName, response.getStatusLine().getStatusCode());
+        } catch (IOException e) {
+          // Ensure entity content is fully consumed and content stream is closed.
+          EntityUtils.consume(response.getEntity());
+          throw e;
         }
       }
       try (BufferedInputStream bis = new BufferedInputStream(response.getEntity().getContent())) {
@@ -292,6 +297,10 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
         }
         // Success, return the response.
         return remoteResponse.getResponseAsBytes();
+      } catch (IOException e) {
+        // Ensure entity content is fully consumed and content stream is closed.
+        EntityUtils.consume(response.getEntity());
+        throw e;
       }
     } catch (IOException e) {
       logger.warning(
@@ -397,6 +406,7 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
     // Performance tweaks.
     params.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, Boolean.TRUE);
     params.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, Boolean.FALSE);
+    params.setBooleanParameter(CoreConnectionPNames.SO_KEEPALIVE, Boolean.TRUE);
     request.setParams(params);
 
     // The request deadline can be overwritten by the environment, read deadline if available.
@@ -419,6 +429,7 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
       request.setHeader(
           VmApiProxyEnvironment.AttributeMapping.DAPPER_ID.headerKey, (String) dapperHeader);
     }
+    
 
     // If the incoming request has a Cloud trace header: set it on outgoing API calls
     // so they are tied to the original request.
