@@ -278,10 +278,11 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
           logger.warning("Error body: " + errorStreamScanner.useDelimiter("\\Z").next());
           throw new RPCFailedStatusException(
               packageName, methodName, response.getStatusLine().getStatusCode());
-        } catch (IOException e) {
+        }
+      } else {
+        if (response.getEntity() != null) {
           // Ensure entity content is fully consumed and content stream is closed.
           EntityUtils.consume(response.getEntity());
-          throw e;
         }
       }
       try (BufferedInputStream bis = new BufferedInputStream(response.getEntity().getContent())) {
@@ -297,10 +298,6 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
         }
         // Success, return the response.
         return remoteResponse.getResponseAsBytes();
-      } catch (IOException e) {
-        // Ensure entity content is fully consumed and content stream is closed.
-        EntityUtils.consume(response.getEntity());
-        throw e;
       }
     } catch (IOException e) {
       logger.warning(
