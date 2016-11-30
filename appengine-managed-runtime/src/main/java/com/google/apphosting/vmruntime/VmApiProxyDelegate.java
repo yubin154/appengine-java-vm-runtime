@@ -85,7 +85,8 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
   public static final String REQUEST_ENDPOINT = "/rpc_http";
   public static final String REQUEST_STUB_ID = "app-engine-apis";
   // HTTP header for Memcache for only one user.
-  public static final String MEMCACHE_REQUEST_STUB_ID = "app-engine-apis/AIzaSyCXnOjfmRAOwjuKHzHhhWMgLfKAlrgQN1s";
+  public static final String MEMCACHE_REQUEST_STUB_ID =
+      "app-engine-apis/AIzaSyCXnOjfmRAOwjuKHzHhhWMgLfKAlrgQN1s";
   public static final String REQUEST_STUB_METHOD = "/VMRemoteAPI.CallRemoteAPI";
 
   // This is the same definition as com.google.apphosting.api.API_DEADLINE_KEY. It is also defined
