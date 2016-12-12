@@ -30,6 +30,7 @@
 
   <properties>
     <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
+    <appengine.api.version>1.9.40</appengine.api.version>
   </properties>
 
   <dependencies>
@@ -45,15 +46,11 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-      <version>4.4.1</version>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-client</artifactId>
+      <version>${jetty.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>4.4.1</version>
-    </dependency>
+
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
