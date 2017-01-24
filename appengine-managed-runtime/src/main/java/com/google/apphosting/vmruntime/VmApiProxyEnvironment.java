@@ -128,7 +128,7 @@ public class VmApiProxyEnvironment implements ApiProxy.Environment {
   // Control the maximum number of concurrent API calls.
   // https://developers.google.com/appengine/docs/python/backends/#Python_Billing_quotas_and_limits
 
-  static final int MAX_CONCURRENT_API_CALLS = 2000;
+  static final int MAX_CONCURRENT_API_CALLS = 5000;
 
   static final int MAX_PENDING_API_CALLS = 10000;
 
